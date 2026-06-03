@@ -1,0 +1,327 @@
+services:
+
+  # ──────────────── DATABASE ──────────────────────────────
+  mysql:
+    image: mysql:8.0
+    hostname: mysql
+    container_name: mysql
+    ports:
+      - "3307:3306"          # expose ra host port 3307 để không đụng MySQL local
+    environment:
+      MYSQL_ROOT_PASSWORD: "Duyanh090@"
+      MYSQL_ROOT_HOST: "%"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d   # auto-create all databases
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-pDuyanh090@"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ──────────────── MESSAGE BROKER (Assignment 06) ────────────────
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"       # AMQP
+      - "15672:15672"     # Management UI  →  http://localhost:15672  (guest/guest)
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  neo4j:
+    image: neo4j:5.22
+    restart: unless-stopped
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      NEO4J_AUTH: neo4j/learnmart_graph_password
+    volumes:
+      - neo4j_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p learnmart_graph_password 'RETURN 1' || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  # ──────────────── API GATEWAY (Assignment 06) ────────────────────
+  api_gateway:
+    build: ./api_gateway
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api_gateway:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      auth_service:
+        condition: service_started
+      product_service:
+        condition: service_started
+      order_service:
+        condition: service_started
+      customer_service:
+        condition: service_started
+      staff_service:
+        condition: service_started
+      marketing_service:
+        condition: service_started
+      inventory_service:
+        condition: service_started
+      content_service:
+        condition: service_started
+      interaction_service:
+        condition: service_started
+      analytics_service:
+        condition: service_started
+      notification_service:
+        condition: service_started
+      behavior_service:
+        condition: service_started
+      ai_chat_service:
+        condition: service_started
+
+  # ──────────────── SERVICES ────────────────────────────────────────
+  auth_service:
+    build: ./auth_service
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./auth_service:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8001 --reload
+    environment:
+      DATABASE_URL: mysql+pymysql://root:Duyanh090%40@mysql:3306/auth_db
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  product_service:
+    build: ./product_service
+    restart: unless-stopped
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./product_service:/app
+    command: uvicorn app:app --host 0.0.0.0 --port 8002 --reload
+    environment:
+      DATABASE_URL: mysql+pymysql://root:Duyanh090%40@mysql:3306/product_db
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  order_service:
+    build: ./order_service
+    restart: unless-stopped
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./order_service:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8003 --reload
+    environment:
+      DATABASE_URL: mysql+pymysql://root:Duyanh090%40@mysql:3306/order_db
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  customer_service:
+    build: ./customer_service
+    restart: unless-stopped
+    ports:
+      - "8004:8004"
+    volumes:
+      - ./customer_service:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8004 --reload
+    environment:
+      DATABASE_URL: mysql+pymysql://root:Duyanh090%40@mysql:3306/customer_db
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  staff_service:
+    build: ./staff_service
+    restart: unless-stopped
+    ports:
+      - "8005:8005"
+    volumes:
+      - ./staff_service:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8005 --reload
+    environment:
+      DATABASE_URL: mysql+pymysql://root:Duyanh090%40@mysql:3306/staff_db
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  marketing_service:
+    build: ./marketing_service
+    restart: unless-stopped
+    ports:
+      - "8006:8006"
+    volumes:
+      - ./marketing_service:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8006 --reload
+    environment:
+      DATABASE_URL: mysql+pymysql://root:Duyanh090%40@mysql:3306/marketing_db
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  inventory_service:
+    build: ./inventory_service
+    restart: unless-stopped
+    ports:
+      - "8007:8007"
+    volumes:
+      - ./inventory_service:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8007 --reload
+    environment:
+      DATABASE_URL: mysql+pymysql://root:Duyanh090%40@mysql:3306/inventory_db
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  content_service:
+    build: ./content_service
+    restart: unless-stopped
+    ports:
+      - "8008:8008"
+    volumes:
+      - ./content_service:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8008 --reload
+    environment:
+      DATABASE_URL: mysql+pymysql://root:Duyanh090%40@mysql:3306/content_db
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  interaction_service:
+    build: ./interaction_service
+    restart: unless-stopped
+    ports:
+      - "8009:8009"
+    volumes:
+      - ./interaction_service:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8009 --reload
+    environment:
+      DATABASE_URL: mysql+pymysql://root:Duyanh090%40@mysql:3306/interaction_db
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  analytics_service:
+    build: ./analytics_service
+    restart: unless-stopped
+    ports:
+      - "8010:8010"
+    volumes:
+      - ./analytics_service:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8010 --reload
+    environment:
+      DATABASE_URL: mysql+pymysql://root:Duyanh090%40@mysql:3306/analytics_db
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  notification_service:
+    build: ./notification_service
+    ports:
+      - "8011:8011"
+    volumes:
+      - ./notification_service:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8011 --reload
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  behavior_service:
+    build: ./behavior_service
+    restart: unless-stopped
+    ports:
+      - "8013:8013"
+    volumes:
+      - ./behavior_service:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8013 --reload
+    environment:
+      DATABASE_URL: mysql+pymysql://root:Duyanh090%40@mysql:3306/behavior_db
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: learnmart_graph_password
+    depends_on:
+      mysql:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+
+  ai_chat_service:
+    build: ./ai_chat_service
+    ports:
+      - "8012:8012"
+    volumes:
+      - ./ai_chat_service:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8012 --reload
+    environment:
+      AUTH_SERVICE_URL: http://auth_service:8001
+      PRODUCT_SERVICE_URL: http://product_service:8002
+      ORDER_SERVICE_URL: http://order_service:8003
+      CUSTOMER_SERVICE_URL: http://customer_service:8004
+      MARKETING_SERVICE_URL: http://marketing_service:8006
+      ANALYTICS_SERVICE_URL: http://analytics_service:8010
+      BEHAVIOR_SERVICE_URL: http://behavior_service:8013
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: learnmart_graph_password
+    depends_on:
+      auth_service:
+        condition: service_started
+      product_service:
+        condition: service_started
+      order_service:
+        condition: service_started
+      customer_service:
+        condition: service_started
+      marketing_service:
+        condition: service_started
+      analytics_service:
+        condition: service_started
+      behavior_service:
+        condition: service_started
+      neo4j:
+        condition: service_healthy
+
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      api_gateway:
+        condition: service_started
+      ai_chat_service:
+        condition: service_started
+
+volumes:
+  mysql_data:
+  neo4j_data:

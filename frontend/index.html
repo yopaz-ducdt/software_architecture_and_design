@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LearnMart - Microservices</title>
+  <meta name="description" content="Nền tảng bán sách, dụng cụ học tập, đồ chơi và gói quà - Microservices Architecture" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@600;800;900&family=Outfit:wght@400;600;800&family=Playfair+Display:ital,wght@0,600;0,800;1,600&family=Quicksand:wght@500;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=2" />
+  <link rel="stylesheet" href="assistant.css?v=2" />
+</head>
+
+<body>
+  <!-- Toast notifications -->
+  <div id="toast-container"></div>
+
+  <!-- Navbar -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="#/" class="nav-logo" id="nav-logo">
+        <span class="logo-icon">📚</span>
+        <span>LearnMart</span>
+      </a>
+      <div class="nav-links" id="nav-links">
+        <a href="#/" class="nav-link" id="nav-home">Trang chủ</a>
+        <a href="#/products" class="nav-link" id="nav-products">Sản phẩm</a>
+        <a href="#/marketing" class="nav-link" id="nav-promo">Khuyến mãi</a>
+        <a href="#" class="nav-link" id="nav-ai">AI tư vấn</a>
+        <a href="#/staff" class="nav-link hidden" id="nav-staff">Dashboard</a>
+      </div>
+      <div class="nav-actions">
+        <a href="#/cart" class="nav-icon-btn" id="nav-cart" title="Giỏ hàng">
+          🛒 <span class="cart-badge" id="cart-badge">0</span>
+        </a>
+        <a href="#/wishlist" class="nav-icon-btn hidden" id="nav-wishlist" title="Yêu thích">❤️</a>
+        <!-- Theme Switcher -->
+        <div class="theme-switcher">
+          <button class="nav-icon-btn" id="theme-btn" title="Thay đổi giao diện">🎨</button>
+          <div class="theme-dropdown" id="theme-dropdown">
+            <button class="dropdown-item theme-opt" data-theme="cyberpunk">🌌 Cyberpunk</button>
+            <button class="dropdown-item theme-opt" data-theme="ocean">🌊 Deep Ocean</button>
+            <button class="dropdown-item theme-opt" data-theme="emerald">🌿 Emerald Oasis</button>
+            <button class="dropdown-item theme-opt" data-theme="sunset">🌅 Sunset Rose</button>
+            <button class="dropdown-item theme-opt" data-theme="light">☀️ Arctic Light</button>
+          </div>
+        </div>
+        <div class="nav-user hidden" id="nav-user">
+          <button class="user-avatar" id="user-menu-btn"></button>
+          <div class="user-dropdown" id="user-dropdown">
+            <div class="user-info" id="user-info-box"></div>
+            <hr />
+            <a href="#/profile" class="dropdown-item">👤 Hồ sơ</a>
+            <a href="#/orders" class="dropdown-item">📦 Đơn hàng</a>
+            <a href="#/notifications" class="dropdown-item">🔔 Thông báo</a>
+            <button class="dropdown-item danger" id="logout-btn">🔓 Đăng xuất</button>
+          </div>
+        </div>
+        <a href="#/login" class="btn btn-outline" id="nav-login">Đăng nhập</a>
+        <a href="#/register" class="btn btn-primary" id="nav-register">Đăng ký</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main id="app"></main>
+
+  <!-- Modal -->
+  <div id="modal-overlay" class="hidden">
+    <div id="modal" class="modal-box">
+      <button id="modal-close" class="modal-close-btn">✕</button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <script src="api.js?v=2"></script>
+  <script src="app.js?v=2"></script>
+  <script src="assistant.js?v=2"></script>
+</body>
+
+</html>

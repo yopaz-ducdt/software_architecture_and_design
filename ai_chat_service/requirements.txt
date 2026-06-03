@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+httpx
+python-jose[cryptography]
+scikit-learn
+numpy
+joblib
+neo4j
+torch
+pandas
+matplotlib

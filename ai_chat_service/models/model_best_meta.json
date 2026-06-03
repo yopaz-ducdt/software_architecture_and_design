@@ -1,0 +1,30 @@
+{
+  "best_model": "bilstm",
+  "actions": [
+    "search",
+    "view",
+    "click",
+    "add_to_cart",
+    "wishlist",
+    "coupon_view",
+    "checkout",
+    "purchase"
+  ],
+  "personas": [
+    "new_explorer",
+    "category_browser",
+    "deal_hunter",
+    "loyal_member",
+    "high_intent_buyer"
+  ],
+  "next_actions": [
+    "recommend_entry_products",
+    "push_coupon",
+    "bundle_related_products",
+    "upsell_membership",
+    "reengage_catalog"
+  ],
+  "device": "cpu",
+  "train_size": 400,
+  "valid_size": 100
+}

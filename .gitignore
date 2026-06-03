@@ -1,0 +1,56 @@
+# ── Python ──────────────────────────────────────────────
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+pip-wheel-metadata/
+*.egg
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# ── Environment & secrets ───────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── IDE / editor ────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ── OS ──────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Logs & runtime ──────────────────────────────────────
+*.log
+logs/
+
+# ── Docker (local overrides only) ───────────────────────
+docker-compose.override.yml
+
+# ── Jupyter / notebooks ─────────────────────────────────
+.ipynb_checkpoints/
+
+# ── Optional: ML artifacts (uncomment if you regenerate) ─
+# ai_pipeline/reports/
+# ai_pipeline/models/*.pt
+# ai_chat_service/models/*.pt
+# ai_chat_service/models/*.joblib
