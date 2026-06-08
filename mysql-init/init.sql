@@ -15,5 +15,5 @@ CREATE DATABASE IF NOT EXISTS notification_db CHARACTER SET utf8mb4 COLLATE utf8
 CREATE DATABASE IF NOT EXISTS behavior_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- MySQL 8: update root user để accept connections từ bất kỳ host nào
-ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'Duyanh090@';
+ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'trungduc';
 FLUSH PRIVILEGES;

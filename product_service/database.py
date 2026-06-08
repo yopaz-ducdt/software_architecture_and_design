@@ -3,7 +3,7 @@ import os, time
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
-DATABASE_URL = os.getenv('DATABASE_URL', 'mysql+pymysql://root:Duyanh090%40@mysql:3306/product_db')
+DATABASE_URL = os.getenv('DATABASE_URL', 'mysql+pymysql://root:trungduc@mysql:3306/product_db')
 engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

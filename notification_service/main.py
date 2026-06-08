@@ -13,7 +13,7 @@ import json
 import logging
 import threading
 
-DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:Duyanh090%40@mysql:3306/notification_db")
+DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:trungduc@mysql:3306/notification_db")
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()

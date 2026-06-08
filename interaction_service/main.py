@@ -12,7 +12,7 @@ from typing import Optional, List
 from datetime import datetime
 import uuid
 
-DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:Duyanh090%40@mysql:3306/interaction_db")
+DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:trungduc@mysql:3306/interaction_db")
 engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()

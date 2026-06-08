@@ -22,7 +22,7 @@ for s in services:
             
         db_name = s.replace('_service', '') + '_db'
         
-        replacement = f'DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:Duyanh090%40@mysql:3306/{db_name}")'
+        replacement = f'DATABASE_URL = os.getenv("DATABASE_URL", "mysql+pymysql://root:trungduc@mysql:3306/{db_name}")'
         
         new_content = pattern.sub(replacement, content)
         

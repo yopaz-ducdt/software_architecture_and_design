@@ -8,7 +8,7 @@ from models import Base
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "mysql+pymysql://root:Duyanh090%40@mysql:3306/customer_db"
+    "mysql+pymysql://root:trungduc@mysql:3306/customer_db"
 )
 
 engine = create_engine(DATABASE_URL, pool_pre_ping=True)

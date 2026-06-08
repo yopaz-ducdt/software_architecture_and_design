@@ -861,7 +861,7 @@ curl http://localhost:8000/notifications/ \
 | notification_service | 8011 | http://localhost:8011 (direct) |
 | ai_chat_service | 8012 | http://localhost:8012 (direct) |
 | behavior_service | 8013 | http://localhost:8013 (direct) |
-| MySQL | 3307 | localhost:3307 (password: `Duyanh090@`) |
+| MySQL | 3307 | localhost:3307 (password: `trungduc`) |
 | Neo4j UI | 7474 | http://localhost:7474 (neo4j/learnmart_graph_password) |
 | RabbitMQ AMQP | 5672 | amqp://guest:guest@localhost:5672 |
 | RabbitMQ UI | 15672 | http://localhost:15672 (guest/guest) |
@@ -888,7 +888,7 @@ Khi chạy bằng Docker Compose, quá trình tạo Database và Tables được
 
 Nếu bạn muốn chạy từng file `main.py` trực tiếp ở host (máy ảo local) mà vẫn muốn khởi tạo 11 database MySQL tương ứng, project cung cấp sẵn công cụ migrate.
 
-**Điều kiện:** MySQL Server tại máy (hoặc Docker chạy riêng MySQL ở cổng 3306) đang hoạt động với tài khoản tương ứng trong config (mặc định: `root` / `Duyanh090@`).
+**Điều kiện:** MySQL Server tại máy (hoặc Docker chạy riêng MySQL ở cổng 3306) đang hoạt động với tài khoản tương ứng trong config (mặc định: `root` / `trungduc`).
 
 **Chạy Migration Script:**
 Bạn có thể sử dụng 1 trong 2 file `setup_and_migrate.py` hoặc `migrate.py`. (Khuyên dùng `setup_and_migrate.py` phiên bản mới).

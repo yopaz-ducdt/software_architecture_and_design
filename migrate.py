@@ -11,7 +11,7 @@ from sqlalchemy.engine import URL
 from sqlalchemy import create_engine
 
 MYSQL_USER     = "root"
-MYSQL_PASSWORD = "Duyanh090@"
+MYSQL_PASSWORD = "trungduc"
 MYSQL_HOST     = "localhost"
 MYSQL_PORT     = 3306
 
