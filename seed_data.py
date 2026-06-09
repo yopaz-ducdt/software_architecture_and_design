@@ -17,6 +17,7 @@ if hasattr(sys.stdout, "buffer"):
 BASE = {
     "auth": "http://localhost:8001",
     "product": "http://localhost:8002",
+    "order": "http://localhost:8003",
     "customer": "http://localhost:8004",
     "staff": "http://localhost:8005",
     "marketing": "http://localhost:8006",
@@ -26,6 +27,122 @@ BASE = {
     "analytics": "http://localhost:8010",
     "behavior": "http://localhost:8013",
 }
+
+
+DEMO_CUSTOMERS = [
+    {
+        "name": "Minh Anh",
+        "email": "minhanh@learnmart.vn",
+        "password": "demo123",
+        "phone": "0901001001",
+        "bio": "Sinh viên năm nhất, hay mua sách kỹ năng và đồ ghi chép.",
+        "address": {"street": "12 Nguyễn Văn Cừ", "city": "TP.HCM", "state": "Q5"},
+        "persona": "book_focused_student",
+        "queries": ["atomic habits", "sách self help giảm giá", "sổ tay b5 campus"],
+        "product_skus": ["BOOK-ATOMIC-HABITS", "STA-CAMPUS-B5", "DECOR-MINI-LAMP"],
+        "wishlist_indexes": [0, 1],
+        "cart": [(0, 1), (1, 3)],
+        "orders": [(0, 1), (1, 2)],
+    },
+    {
+        "name": "Quốc Bảo",
+        "email": "quocbao@learnmart.vn",
+        "password": "demo123",
+        "phone": "0901001002",
+        "bio": "Học sinh THPT quan tâm máy tính, ba lô và bình nước đi học.",
+        "address": {"street": "45 Lê Lợi", "city": "Đà Nẵng", "state": "Hải Châu"},
+        "persona": "exam_ready_student",
+        "queries": ["casio 580vnx", "balo đi học chống thấm", "bình giữ nhiệt học sinh"],
+        "product_skus": ["TECH-CASIO-580VNX", "BAG-MITI-ACTIVE", "BOT-LOCK-500"],
+        "wishlist_indexes": [0],
+        "cart": [(0, 1), (1, 1)],
+        "orders": [(0, 1)],
+    },
+    {
+        "name": "Gia Hân",
+        "email": "giahan@learnmart.vn",
+        "password": "demo123",
+        "phone": "0901001003",
+        "bio": "Phụ huynh tìm đồ chơi giáo dục, quà tặng và dụng cụ mỹ thuật.",
+        "address": {"street": "88 Trần Phú", "city": "Hà Nội", "state": "Ba Đình"},
+        "persona": "parent_gift_buyer",
+        "queries": ["lego creative box", "gói quà back to school", "chì màu 24 màu"],
+        "product_skus": ["TOY-LEGO-CREATIVE", "GIFT-BTS-01", "ART-FABER-24"],
+        "wishlist_indexes": [0, 2],
+        "cart": [(0, 1), (1, 1)],
+        "orders": [(0, 1), (1, 1), (2, 1)],
+    },
+    {
+        "name": "Thanh Tùng",
+        "email": "thanhtung@learnmart.vn",
+        "password": "demo123",
+        "phone": "0901001004",
+        "bio": "Nhân viên văn phòng thích săn voucher và mua combo giá tốt.",
+        "address": {"street": "19 Cầu Giấy", "city": "Hà Nội", "state": "Cầu Giấy"},
+        "persona": "deal_hunter",
+        "queries": ["sale dụng cụ học tập", "voucher learnmart", "coupon bình giữ nhiệt"],
+        "product_skus": ["STA-CAMPUS-B5", "BOT-LOCK-500", "SOU-MOJI-CAPY"],
+        "wishlist_indexes": [1, 2],
+        "cart": [(0, 2), (2, 2)],
+        "orders": [(0, 2)],
+    },
+    {
+        "name": "Ngọc Linh",
+        "email": "ngoclinh@learnmart.vn",
+        "password": "demo123",
+        "phone": "0901001005",
+        "bio": "Người dùng yêu góc học tập đẹp, thường xem đèn bàn và đồ trang trí.",
+        "address": {"street": "27 Pasteur", "city": "TP.HCM", "state": "Q3"},
+        "persona": "desk_setup_browser",
+        "queries": ["đèn bàn học led", "trang trí bàn học", "móc khóa dễ thương"],
+        "product_skus": ["DECOR-MINI-LAMP", "SOU-MOJI-CAPY", "BOT-LOCK-500"],
+        "wishlist_indexes": [0],
+        "cart": [(0, 1)],
+        "orders": [],
+    },
+    {
+        "name": "Hoàng Nam",
+        "email": "hoangnam@learnmart.vn",
+        "password": "demo123",
+        "phone": "0901001006",
+        "bio": "Sinh viên mỹ thuật mua màu vẽ, sổ và đồ trang trí bàn học.",
+        "address": {"street": "31 Nguyễn Huệ", "city": "Huế", "state": "Phú Hội"},
+        "persona": "art_student",
+        "queries": ["faber castell 24 màu", "sổ phác thảo", "đèn bàn vẽ"],
+        "product_skus": ["ART-FABER-24", "STA-CAMPUS-B5", "DECOR-MINI-LAMP"],
+        "wishlist_indexes": [0, 2],
+        "cart": [(0, 1), (1, 1)],
+        "orders": [(0, 1), (1, 1)],
+    },
+    {
+        "name": "Mai Chi",
+        "email": "maichi@learnmart.vn",
+        "password": "demo123",
+        "phone": "0901001007",
+        "bio": "Khách mới chỉ tìm kiếm, xem sản phẩm và chưa mua hàng.",
+        "address": {"street": "7 Phan Chu Trinh", "city": "Đà Lạt", "state": "Phường 1"},
+        "persona": "new_explorer",
+        "queries": ["quà tặng học sinh", "balo miti active", "lego cho bé 6 tuổi"],
+        "product_skus": ["GIFT-BTS-01", "BAG-MITI-ACTIVE", "TOY-LEGO-CREATIVE"],
+        "wishlist_indexes": [],
+        "cart": [],
+        "orders": [],
+    },
+    {
+        "name": "Đức Khang",
+        "email": "duckhang@learnmart.vn",
+        "password": "demo123",
+        "phone": "0901001008",
+        "bio": "Khách thân thiết mua lặp lại sách, đồ học tập và thiết bị hỗ trợ học.",
+        "address": {"street": "101 Võ Văn Tần", "city": "TP.HCM", "state": "Q3"},
+        "persona": "loyal_member",
+        "queries": ["sách kỹ năng", "casio chính hãng", "combo tựu trường"],
+        "product_skus": ["BOOK-ATOMIC-HABITS", "TECH-CASIO-580VNX", "GIFT-BTS-01", "BAG-MITI-ACTIVE"],
+        "wishlist_indexes": [1, 3],
+        "cart": [(0, 1), (2, 1)],
+        "orders": [(0, 1), (1, 1), (2, 1), (3, 1), (0, 2)],
+    },
+]
 
 
 def log(message):
@@ -90,6 +207,7 @@ def wait_services():
     health_urls = [
         f"{BASE['auth']}/health",
         f"{BASE['product']}/health",
+        f"{BASE['order']}/health",
         f"{BASE['customer']}/health",
         f"{BASE['staff']}/health",
         f"{BASE['marketing']}/health",
@@ -118,23 +236,27 @@ def wait_services():
             log_warn(f"Health not ready: {url}")
 
 
-def ensure_customer():
+def ensure_customer_account(name, email, password):
     post(
         f"{BASE['auth']}/register/customer",
-        {"name": "Khách Hàng Demo", "email": "demo@learnmart.vn", "password": "demo123"},
-        "register customer",
+        {"name": name, "email": email, "password": password},
+        f"register customer {email}",
         retries=2,
         delay=1,
     )
     token = post(
         f"{BASE['auth']}/login/customer",
-        {"email": "demo@learnmart.vn", "password": "demo123"},
-        "login customer",
+        {"email": email, "password": password},
+        f"login customer {email}",
     )
     if not token:
         return 1
     me = get(f"{BASE['auth']}/me?token={token['access_token']}") or {}
     return me.get("user_id", 1)
+
+
+def ensure_customer():
+    return ensure_customer_account("Khách Hàng Demo", "demo@learnmart.vn", "demo123")
 
 
 def ensure_staff():
@@ -177,6 +299,172 @@ def build_product_payloads(category_map, type_map, brand_map):
     ]
 
 
+def get_or_create_profile(customer_id, phone, bio):
+    profile = post(
+        f"{BASE['customer']}/profile",
+        {"customer_id": customer_id, "phone": phone, "bio": bio},
+        f"Profile customer {customer_id}",
+        retries=2,
+        delay=1,
+    )
+    if not profile:
+        profile = get(f"{BASE['customer']}/profile/{customer_id}") or {"id": customer_id}
+    return profile
+
+
+def seed_customer_address(profile_id, address, label):
+    post(
+        f"{BASE['customer']}/addresses",
+        {
+            "customer_profile_id": profile_id,
+            "street": address["street"],
+            "city": address["city"],
+            "state": address["state"],
+            "is_default": True,
+        },
+        label,
+    )
+
+
+def category_name_for_product(product):
+    category_lookup = {item["slug"]: item["name"] for item in DEFAULT_CATEGORIES}
+    return category_lookup.get(product["category_slug"])
+
+
+def product_lookup_from_catalog(products):
+    api_by_sku = {item["sku"]: item for item in products if item.get("sku")}
+    by_sku = {}
+    for default_product in DEFAULT_PRODUCTS:
+        api_product = api_by_sku.get(default_product["sku"])
+        if api_product:
+            by_sku[default_product["sku"]] = {**default_product, "id": api_product["id"]}
+    return by_sku
+
+
+def behavior_event(customer_id, event_type, *, product=None, query=None, quantity=1, occurred_at=None, metadata=None):
+    body = {
+        "customer_id": customer_id,
+        "event_type": event_type,
+        "source": "seed_data",
+        "quantity": quantity,
+    }
+    if occurred_at:
+        body["occurred_at"] = occurred_at.isoformat()
+    if query:
+        body["query"] = query
+    if metadata:
+        body["metadata"] = metadata
+    if product:
+        body.update(
+            {
+                "book_id": product["id"],
+                "category_name": category_name_for_product(product),
+                "price": product["price"],
+            }
+        )
+    post(f"{BASE['behavior']}/events", body, f"Behavior {event_type} c{customer_id}", retries=2, delay=1)
+
+
+def seed_customer_journey(customer_id, persona, products_by_sku, start_at):
+    selected = []
+    for sku in persona["product_skus"]:
+        product = products_by_sku.get(sku)
+        if product:
+            selected.append(product)
+    if not selected:
+        return
+
+    step = 0
+    for query in persona["queries"]:
+        behavior_event(
+            customer_id,
+            "search_performed",
+            query=query,
+            occurred_at=start_at + timedelta(hours=step),
+            metadata={"persona": persona["persona"]},
+        )
+        step += 1
+
+    for index, product in enumerate(selected):
+        behavior_event(
+            customer_id,
+            "product_viewed",
+            product=product,
+            occurred_at=start_at + timedelta(hours=step),
+            metadata={"rank": index + 1, "persona": persona["persona"]},
+        )
+        step += 1
+        if index == 0:
+            behavior_event(
+                customer_id,
+                "product_clicked_from_listing",
+                product=product,
+                occurred_at=start_at + timedelta(hours=step),
+                metadata={"listing": "search_results"},
+            )
+            step += 1
+
+    for index in persona["wishlist_indexes"]:
+        if index < len(selected):
+            product = selected[index]
+            post(f"{BASE['customer']}/wishlist/{customer_id}/toggle/{product['id']}", {}, f"Wishlist c{customer_id}")
+            behavior_event(
+                customer_id,
+                "wishlist_added",
+                product=product,
+                occurred_at=start_at + timedelta(hours=step),
+                metadata={"persona": persona["persona"]},
+            )
+            step += 1
+
+    for index, quantity in persona["cart"]:
+        if index < len(selected):
+            product = selected[index]
+            post(
+                f"{BASE['order']}/cart/{customer_id}/add",
+                {"book_id": product["id"], "quantity": quantity, "unit_price": product["price"]},
+                f"Cart c{customer_id}",
+                retries=2,
+                delay=1,
+            )
+            behavior_event(
+                customer_id,
+                "cart_added",
+                product=product,
+                quantity=quantity,
+                occurred_at=start_at + timedelta(hours=step),
+                metadata={"persona": persona["persona"]},
+            )
+            step += 1
+
+    if persona["cart"]:
+        first_cart_product = selected[persona["cart"][0][0]]
+        behavior_event(
+            customer_id,
+            "checkout_started",
+            product=first_cart_product,
+            quantity=sum(quantity for _, quantity in persona["cart"]),
+            occurred_at=start_at + timedelta(hours=step),
+            metadata={"payment_method": "COD"},
+        )
+        step += 1
+
+    for index, quantity in persona["orders"]:
+        if index < len(selected):
+            product = selected[index]
+            behavior_event(
+                customer_id,
+                "order_completed",
+                product=product,
+                quantity=quantity,
+                occurred_at=start_at + timedelta(hours=step),
+                metadata={"coupon_code": "SALE20" if persona["persona"] == "deal_hunter" else None},
+            )
+            step += 1
+
+    post(f"{BASE['behavior']}/profiles/{customer_id}/refresh", {}, f"Refresh behavior profile c{customer_id}", retries=2, delay=1)
+
+
 def main():
     wait_services()
     log("\n=== Seeding Accounts ===")
@@ -215,6 +503,7 @@ def main():
     existing = get(f"{BASE['product']}/products?limit=50") or []
     if not product_ids:
         product_ids = [item["id"] for item in existing[:10]]
+    products_by_sku = product_lookup_from_catalog(existing)
 
     log("\n=== Seeding Product Ratings & Reviews ===")
     if product_ids:
@@ -283,6 +572,49 @@ def main():
     )
     if product_ids:
         post(f"{BASE['customer']}/wishlist/{customer_id}/toggle/{product_ids[0]}", {}, "Wishlist")
+
+    log("\n=== Seeding Demo Customers & Behavior Journeys ===")
+    journey_start = datetime.now(timezone.utc) - timedelta(days=21)
+    demo_customer_ids = []
+    for index, persona in enumerate(DEMO_CUSTOMERS, start=1):
+        customer = ensure_customer_account(persona["name"], persona["email"], persona["password"])
+        demo_customer_ids.append(customer)
+        profile = get_or_create_profile(customer, persona["phone"], persona["bio"])
+        seed_customer_address(profile.get("id", customer), persona["address"], f"Address c{customer}")
+        post(
+            f"{BASE['customer']}/newsletter/subscribe",
+            {"email": persona["email"]},
+            f"Newsletter c{customer}",
+            retries=2,
+            delay=1,
+        )
+        seed_customer_journey(customer, persona, products_by_sku, journey_start + timedelta(days=index * 2))
+
+    review_templates = [
+        ("Giao nhanh", "Đóng gói chắc chắn, sản phẩm đúng mô tả."),
+        ("Phù hợp nhu cầu học tập", "Chất lượng ổn, dùng hằng ngày rất tiện."),
+        ("Đáng tiền", "Mức giá hợp lý, sẽ cân nhắc mua thêm."),
+        ("Quà tặng đẹp", "Người nhận thích, hình thức bên ngoài chỉn chu."),
+    ]
+    for index, customer in enumerate(demo_customer_ids[:4]):
+        product = list(products_by_sku.values())[index % len(products_by_sku)] if products_by_sku else None
+        if not product:
+            continue
+        title, body = review_templates[index]
+        post(
+            f"{BASE['product']}/ratings",
+            {"product_id": product["id"], "customer_id": customer, "score": 5 - (index % 2)},
+            f"rating c{customer}",
+            retries=2,
+            delay=1,
+        )
+        post(
+            f"{BASE['product']}/reviews",
+            {"product_id": product["id"], "customer_id": customer, "title": title, "body": body},
+            f"review c{customer}",
+            retries=2,
+            delay=1,
+        )
 
     log("\n=== Seeding Staff / Inventory / Content ===")
     department = post(
@@ -371,7 +703,7 @@ def main():
             {
                 "customer_id": customer_id,
                 "event_type": "product_viewed",
-                "product_id": product_ids[0],
+                "book_id": product_ids[0],
                 "category_name": category_name,
                 "price": first_product["price"],
                 "source": "seed",
@@ -383,7 +715,7 @@ def main():
             {
                 "customer_id": customer_id,
                 "event_type": "cart_added",
-                "product_id": product_ids[0],
+                "book_id": product_ids[0],
                 "category_name": category_name,
                 "price": first_product["price"],
                 "quantity": 1,
