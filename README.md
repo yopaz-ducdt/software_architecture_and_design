@@ -1,15 +1,14 @@
-# LearnMart Marketplace
+# LearnMart
 
 LearnMart là project marketplace theo hướng `DDD + Microservices`, được mở rộng từ mô hình bookstore cũ sang catalog đa sản phẩm.
 
-Hiện tại hệ thống có:
-- `product_service` cho catalog chung
-- `order_service` cho cart, checkout, payment, shipping, order
-- `behavior_service` để lưu và aggregate hành vi người dùng
-- `ai_chat_service` dùng catalog, knowledge base, RAG và behavior profile để recommend
-- đã tích hợp pipeline AI Service gồm `data_user500.csv`, huấn luyện `RNN/LSTM/biLSTM`, chọn `model_best=biLSTM` và suy luận trực tiếp trong flow e-commerce
+Hệ thống được thiết kế bao gồm nhiều vi dịch vụ (microservices) chuyên biệt nhằm xử lý toàn diện các nghiệp vụ e-commerce và AI. Các điểm nhấn nổi bật của dự án bao gồm:
 
-Catalog mẫu đã được mở rộng lên `10 nhóm sản phẩm` và `10 sản phẩm demo`.
+- **E-commerce cốt lõi:** Các dịch vụ như `product_service` và `order_service` đảm nhiệm việc quản lý danh mục sản phẩm, giỏ hàng, quy trình thanh toán (checkout) và vận chuyển.
+- **Phân tích hành vi:** `behavior_service` thu thập và tổng hợp dữ liệu tương tác của người dùng theo thời gian thực.
+- **AI & Trợ lý thông minh:** Tích hợp hoàn chỉnh pipeline AI (huấn luyện các mô hình `RNN/LSTM/biLSTM` từ tập dữ liệu và triển khai suy luận trực tiếp với model `biLSTM`). Đồng thời, `ai_chat_service` kết hợp Knowledge Base, RAG và hồ sơ hành vi người dùng (behavior profile) để tạo ra các đề xuất mua sắm mang tính cá nhân hoá cao.
+
+Đi kèm với hệ thống là bộ dữ liệu (Catalog) mẫu đã được mở rộng lên **10 nhóm sản phẩm** cùng dữ liệu hàng hoá phong phú, sẵn sàng phục vụ cho việc kiểm thử các luồng nghiệp vụ và AI.
 
 ## Services
 
@@ -76,10 +75,11 @@ docker compose down
 
 ## Seed Data
 
-Project hiện có 3 nguồn seed chính:
-- [seed_catalog.py](/D:/This%20Semester/Analysis%20and%20Design/assignment_6_ddd_marketplace/seed_catalog.py): dữ liệu catalog dùng chung
-- [seed_data.py](/D:/This%20Semester/Analysis%20and%20Design/assignment_6_ddd_marketplace/seed_data.py): seed đầy đủ dữ liệu demo toàn hệ thống
-- [seed_ai_demo.py](/D:/This%20Semester/Analysis%20and%20Design/assignment_6_ddd_marketplace/seed_ai_demo.py): seed nhanh cho flow AI/behavior
+Project hiện có 4 nguồn seed chính:
+- [seed_catalog.py](./seed_catalog.py): dữ liệu catalog dùng chung
+- [seed_data.py](./seed_data.py): seed đầy đủ dữ liệu demo toàn hệ thống
+- [seed_ai_demo.py](./seed_ai_demo.py): seed nhanh cho flow AI/behavior
+- [seed_products_bulk.py](./seed_products_bulk.py): seed số lượng lớn sản phẩm vào database
 
 Seed đầy đủ:
 
@@ -137,10 +137,20 @@ Staff:
 
 ## Notes
 
-- Nên dùng [docker-compose.yml](/D:/This%20Semester/Analysis%20and%20Design/assignment_6_ddd_marketplace/docker-compose.yml) thay cho [start_all.bat](/D:/This%20Semester/Analysis%20and%20Design/assignment_6_ddd_marketplace/start_all.bat), vì file batch này đang cũ và còn tham chiếu `BookStore`.
+- Nên dùng [docker-compose.yml](./docker-compose.yml) thay cho [start_all.bat](./start_all.bat) (Windows) hoặc [start_all.sh](./start_all.sh) (macOS/Linux). File batch/shell này đang cũ và còn tham chiếu `BookStore`.
 - Một số service vẫn còn tên trường nội bộ như `book_id` ở database/model cũ. API layer đã map tương thích sang `product_id`.
 - `behavior_service` là nguồn dữ liệu hành vi cho AI recommendation và personalization.
 - `ai_chat_service` hiện dùng catalog hiện tại, knowledge base và behavior snapshot để trả lời.
+
+## Tài liệu (Documentation)
+
+Dự án đi kèm nhiều tài liệu chi tiết, vui lòng xem thêm:
+- [HUONG_DAN_CHI_TIET.md](./HUONG_DAN_CHI_TIET.md) - Hướng dẫn chi tiết tổng thể
+- [HUONG_DAN_CHAY_MACOS.md](./HUONG_DAN_CHAY_MACOS.md) - Dành riêng cho người dùng macOS
+- [ONBOARDING_GUIDE.md](./ONBOARDING_GUIDE.md) - Hướng dẫn onboarding cho developer mới
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - Kiến trúc hệ thống
+- [AI_CHATBOT_GUIDE.md](./AI_CHATBOT_GUIDE.md) - Hướng dẫn về dịch vụ AI Chatbot
+- [SEQUENCE_DIAGRAMS_VP.md](./SEQUENCE_DIAGRAMS_VP.md) - Các biểu đồ tuần tự
 
 
 ## AI Service Assignment
