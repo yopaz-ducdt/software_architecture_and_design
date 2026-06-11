@@ -9,18 +9,61 @@ from sequence_behavior_model import SequenceBehaviorModel
 from data_fetcher import ServiceClient
 from graph_store import GraphKBStore
 from kb_store import KBStore
+from llm_service import LLMService
 
 CATEGORY_ALIASES = {
     "Sách": ["sach", "book", "truyen", "self help", "tieu thuyet", "fantasy"],
-    "Dụng cụ học tập": ["dung cu hoc tap", "but", "vo", "so", "stationery", "highlight"],
+    "Dụng cụ học tập": [
+        "dung cu hoc tap",
+        "but",
+        "vo",
+        "so",
+        "stationery",
+        "highlight",
+        "sotay",
+        "so tay",
+        "sổ tay",
+        "di hoc",
+        "đi học",
+        "hoc",
+        "học",
+        "ghi chu",
+        "ghi chú",
+        "viet",
+        "viết",
+        "notebook",
+        "thuoc ke",
+        "thước kẻ",
+    ],
     "Đồ chơi": ["do choi", "lego", "toy", "xep hinh"],
-    "Gói quà": ["goi qua", "gift", "combo", "qua tang"],
-    "Ba lô": ["ba lo", "balo", "backpack", "cap", "tui di hoc"],
+    "Gói quà": ["goi qua", "quà", "qua", "gift", "combo", "qua tang", "set qua tang", "set quà tặng", "sinh nhat", "ky niem", "dip", "tang ban", "tang nguoi yeu"],
+    "Ba lô": ["ba lo", "balo", "backpack", "cap", "tui di hoc", "cap sach", "cặp sách"],
     "Bình nước": ["binh nuoc", "binh giu nhiet", "water bottle", "locknlock"],
-    "Đồ điện tử học tập": ["do dien tu hoc tap", "may tinh", "calculator", "study tech"],
+    "Đồ điện tử học tập": [
+        "do dien tu hoc tap",
+        "may tinh",
+        "calculator",
+        "study tech",
+        "dong ho",
+        "đồng hồ",
+        "dongho",
+        "xem gio",
+        "xem giờ",
+        "watch",
+        "sac du phong",
+        "sạc dự phòng",
+        "cap sac",
+        "cáp sạc",
+        "cuc sac",
+        "cục sạc",
+        "chuot",
+        "chuột",
+    ],
     "Mỹ thuật": ["my thuat", "ve", "chi mau", "art", "thu cong"],
-    "Đồ trang trí bàn học": ["do trang tri ban hoc", "den ban", "desk decor", "goc hoc tap"],
-    "Đồ lưu niệm": ["do luu niem", "moc khoa", "souvenir", "qua nho", "capybara"],
+    "Đồ trang trí bàn học": ["do trang tri ban hoc", "den ban", "desk decor", "goc hoc tap", "ban", "bàn", "ghe", "ghế"],
+    "Đồ lưu niệm": ["do luu niem", "moc khoa", "souvenir", "qua nho", "capybara", "sinh nhat", "ky niem", "dip"],
+    "Đồ ăn vặt": ["do an vat", "đồ ăn vặt", "banh", "bánh", "keo", "kẹo", "snack", "do an"],
+    "Chăm sóc cá nhân": ["cham soc ca nhan", "chăm sóc cá nhân", "may cao rau", "máy cạo râu", "skincare", "kem chong nang", "sua rua mat"],
 }
 
 POLICY_KEYWORDS = [
@@ -49,13 +92,90 @@ PRODUCT_KEYWORDS = [
     "mua gi",
     "san pham",
     "danh muc",
-    "qua",
+    # "qua" đã bỏ — quá mơ hồ, khớp nhầm với "buồn quá", "mệt quá"
+    "goi qua",
+    "qua tang",
     "do dung",
     "phu kien",
+    "xem gio",
+    "xem giờ",
+    "watch",
+    "so tay",
+    "sổ tay",
+    "notebook",
+    "di hoc",
+    "đi học",
+    "hoc tap",
+    "học tập",
+    "ghi chu",
+    "ghi chú",
+    "viet",
+    "viết",
+    "sinh nhat",
+    "ky niem",
+    "dip",
+    "tang ban",
+    "tang nguoi yeu",
+    "sac du phong",
+    "may cao rau",
+    "do an vat",
+    "cap sac",
+    "cuc sac",
+    "chuot",
+    "thuoc ke",
+    "cap sach",
+    "ban hoc",
+    "ghe",
+    "banh",
+    "keo",
 ]
 
-PURCHASE_KEYWORDS = ["mua", "muon mua", "dat mua", "can mua", "tim mua", "chot", "lay"]
+PURCHASE_KEYWORDS = ["mua", "muon mua", "dat mua", "can mua", "tim mua", "chot", "lay", "can", "cần"]
 AVAILABILITY_KEYWORDS = ["co ban", "shop co", "cua hang co", "ben minh co", "co khong"]
+
+GREETING_KEYWORDS = [
+    "hello", "hi", "hey", "xin chao", "chao ban", "chao shop", "chao", "alo",
+    "good morning", "good afternoon", "good evening", "howdy",
+]
+
+EMOTIONAL_KEYWORDS = [
+    # Buồn / tiêu cực — dùng từ đủ dài để tránh khớp nhầm substring
+    "buon",         # đủ dài, an toàn
+    "buon qua",
+    "chan nan",
+    "met moi",
+    "met moi qua",
+    "qua met",
+    "stress",
+    "lo lang",
+    "lo au",
+    "kho chiu",
+    "that vong",
+    "tuc gian",
+    "khoc",
+    "co don",
+    "tram cam",
+    "buon ngu",
+    "khong vui",
+    "toi buon",
+    "minh buon",
+    "dang buon",
+    "sad",
+    "depressed",
+    "lonely",
+    "angry",
+    # Vui / tích cực
+    "vui qua",
+    "vui lam",
+    "phan khich",
+    "hanh phuc",
+    "tuyet voi",
+    "excited",
+    "happy",
+    "hom nay vui",
+    "hom nay tot",
+    "hom nay dep",
+]
 
 
 def _searchable_text(value: str) -> str:
@@ -117,6 +237,15 @@ def detect_categories_strict(question: str) -> list[str]:
 
 def classify_intent(question: str) -> str:
     q = _searchable_text(question)
+    q_tokens = q.split()
+    # 1. Greeting — chỉ khi câu ngắn (≤5 từ) để tránh nhầm
+    if len(q_tokens) <= 5 and any(keyword in q for keyword in GREETING_KEYWORDS):
+        return "greeting"
+    # 2. Emotional — kiểm tra TRƯỚC purchase/product vì nhiều từ cảm xúc là substring
+    #    (ví dụ: "buồn quá" có "qua" từng nằm trong PRODUCT_KEYWORDS)
+    if any(keyword in q for keyword in EMOTIONAL_KEYWORDS):
+        return "emotional"
+    # 3. Các intent mua hàng / chính sách
     if any(keyword in q for keyword in AVAILABILITY_KEYWORDS):
         return "availability_query"
     if any(keyword in q for keyword in PURCHASE_KEYWORDS):
@@ -180,6 +309,7 @@ class MarketplaceAdvisor:
         self.sequence_behavior_model = SequenceBehaviorModel(base_dir)
         self.kb = KBStore(base_dir)
         self.graph = GraphKBStore(base_dir)
+        self.llm = LLMService()
 
     def _category_name(self, product: dict[str, Any], category_lookup: dict[Any, str]) -> str:
         return str(product.get("category_name") or category_lookup.get(product.get("category_id")) or "Khác")
@@ -295,6 +425,71 @@ class MarketplaceAdvisor:
 
         ranked.sort(key=lambda item: (-item["score"], float(item["product"].get("price", 0) or 0)))
         return ranked
+
+    def _format_kb_advice(self, kb_hits: list, min_score: float = 0.05) -> str:
+        """Trích xuất lời khuyên hữu ích từ Knowledge Base nếu có kết quả đủ liên quan."""
+        relevant = [hit for hit in kb_hits if hit.score >= min_score and hit.content.strip()]
+        if not relevant:
+            return ""
+        lines = ["\n💡 Lời khuyên thêm:"]
+        for hit in relevant[:2]:
+            content = hit.content.strip()
+            # Lấy tối đa 2 dòng đầu của content để tóm tắt ngắn gọn
+            preview_lines = [line.strip() for line in content.splitlines() if line.strip()][:3]
+            preview = " ".join(preview_lines)
+            if len(preview) > 200:
+                preview = preview[:200].rsplit(" ", 1)[0] + "..."
+            lines.append(f"- {preview}")
+        return "\n".join(lines)
+
+    def _format_general_answer(
+        self,
+        user_name: str,
+        question: str,
+        kb_hits: list,
+        top_products: list[dict[str, Any]],
+        preferred: list[str],
+        graph_context: dict[str, Any],
+        behavior: Any,
+        snapshot: dict[str, Any],
+    ) -> str:
+        """Xử lý câu hỏi chung: dùng KB để trả lời nội dung + gợi ý sản phẩm từ shop."""
+        lines = [f"Mình đang tư vấn cho {user_name}.", ""]
+
+        # Phần 1: Trả lời từ KB nếu có nội dung liên quan
+        relevant_hits = [hit for hit in kb_hits if hit.score >= 0.05 and hit.content.strip()]
+        if relevant_hits:
+            lines.append("📖 Thông tin hữu ích:")
+            for hit in relevant_hits[:2]:
+                content = hit.content.strip()
+                preview_lines = [line.strip() for line in content.splitlines() if line.strip()][:4]
+                preview = "\n  ".join(preview_lines)
+                lines.append(f"• {hit.title}:\n  {preview}")
+            lines.append("")
+        else:
+            lines.append(
+                "Mình có thể gợi ý sản phẩm theo ngân sách hoặc danh mục, đồng thời hỗ trợ "
+                "các câu hỏi về coupon, thành viên, vận chuyển, giỏ hàng, thanh toán và đổi trả."
+            )
+            lines.append("")
+
+        # Phần 2: Gợi ý sản phẩm phù hợp từ shop
+        if top_products:
+            lines.append("🛍️ Sản phẩm gợi ý từ shop cho bạn:")
+            for idx, item in enumerate(top_products[:3], start=1):
+                product = item["product"]
+                title = product.get("title") or product.get("name") or "Sản phẩm"
+                price = int(float(product.get("price", 0) or 0))
+                stock = int(product.get("stock_quantity", 0) or 0)
+                reasons = item["reasons"][:1] or ["phù hợp nhu cầu hiện tại"]
+                stock_label = "còn hàng" if stock > 0 else "tạm hết"
+                lines.append(f"{idx}. {title} - {price:,}đ ({stock_label}) — {reasons[0]}")
+            lines.append("")
+
+        if preferred:
+            lines.append(f"Gần đây bạn đang quan tâm nhiều đến: {', '.join(preferred[:3])}.")
+
+        return "\n".join(lines)
 
     def _dynamic_context(self, snapshot: dict[str, Any]) -> str:
         marketing = snapshot.get("marketing", {})
@@ -438,161 +633,45 @@ class MarketplaceAdvisor:
         products = snapshot.get("products", [])
         explicit_product = find_explicit_product(question, products)
         preferred = snapshot.get("preferred_categories", [])
-        greeting = f"Mình đang tư vấn cho {user_name}."
         strict_categories = detect_categories_strict(question)
         category_lookup = {item.get("id"): item.get("name") for item in categories}
         graph_context = self.graph.get_context(customer_id, question, top_k=6)
-        top_products = self._score_products(products, categories, snapshot, question, graph_context=graph_context)[:3]
-
-        if intent == "availability_query":
-            if explicit_product:
-                category_name = self._category_name(explicit_product, category_lookup)
-                return {
-                    "answer": self._format_availability_answer(user_name, explicit_product, category_name, [explicit_product]),
-                    "top_products": [explicit_product],
-                    "kb_hits": [hit.__dict__ for hit in kb_hits],
-                    "behavior": behavior.__dict__,
-                    "graph_context": graph_context,
-                }
-
-            if strict_categories:
-                requested_category = strict_categories[0]
-                matched_products = [
-                    product
-                    for product in products
-                    if self._category_name(product, category_lookup) == requested_category
-                ]
-                matched_products.sort(
-                    key=lambda product: (
-                        int(product.get("stock_quantity", 0) or 0) <= 0,
-                        float(product.get("price", 0) or 0),
-                    )
-                )
-                return {
-                    "answer": self._format_availability_answer(user_name, None, requested_category, matched_products),
-                    "top_products": matched_products[:3],
-                    "kb_hits": [hit.__dict__ for hit in kb_hits],
-                    "behavior": behavior.__dict__,
-                    "graph_context": graph_context,
-                }
-
-            return {
-                "answer": "Mình có thể kiểm tra theo tên sản phẩm hoặc theo nhóm như sách, ba lô, đồ chơi, bình nước. Bạn gửi cụ thể hơn giúp mình.",
-                "top_products": [],
-                "kb_hits": [hit.__dict__ for hit in kb_hits],
-                "behavior": behavior.__dict__,
-                "graph_context": graph_context,
-            }
-
-        if intent == "purchase_request" and explicit_product:
-            category_name = self._category_name(explicit_product, category_lookup)
-            return {
-                "answer": self._format_purchase_answer(user_name, explicit_product, category_name, behavior, snapshot),
-                "top_products": [explicit_product],
-                "kb_hits": [hit.__dict__ for hit in kb_hits],
-                "behavior": behavior.__dict__,
-                "graph_context": graph_context,
-            }
-
-        if intent == "purchase_request" and strict_categories:
-            requested_category = strict_categories[0]
+        
+        # Lọc các sản phẩm phù hợp nhất để gửi làm context cho LLM
+        scoped_products = []
+        if explicit_product:
+            scoped_products = [explicit_product]
+        elif strict_categories:
             category_ranked = self._score_products(
                 products,
                 categories,
                 snapshot,
                 question,
-                forced_categories=[requested_category],
+                forced_categories=strict_categories,
                 graph_context=graph_context,
             )[:3]
-            if category_ranked:
-                return {
-                    "answer": self._format_category_purchase_answer(user_name, requested_category, category_ranked, snapshot),
-                    "top_products": [item["product"] for item in category_ranked],
-                    "kb_hits": [hit.__dict__ for hit in kb_hits],
-                    "behavior": behavior.__dict__,
-                    "graph_context": graph_context,
-                }
-
-        if intent == "purchase_request":
-            intent = "product_recommendation"
-
-        if intent == "product_recommendation":
-            scoped_products = top_products
-            if strict_categories:
-                scoped_products = self._score_products(
-                    products,
-                    categories,
-                    snapshot,
-                    question,
-                    forced_categories=strict_categories,
-                    graph_context=graph_context,
-                )[:3]
-
-            if scoped_products:
-                lines = [greeting, "", "Gợi ý sản phẩm phù hợp nhất:"]
-                for idx, item in enumerate(scoped_products, start=1):
-                    product = item["product"]
-                    title = product.get("title") or product.get("name") or "Sản phẩm"
-                    reasons = item["reasons"][:2] or ["phù hợp nhu cầu mua sắm hiện tại"]
-                    lines.append(
-                        f"{idx}. {title} - {int(float(product.get('price', 0) or 0)):,}đ\n"
-                        f"   - Danh mục: {item['category_name']}.\n"
-                        f"   - Lý do: {'; '.join(reasons)}.\n"
-                        f"   - Mô tả ngắn: {product.get('description') or 'Sản phẩm đang có trong catalog hiện tại.'}"
-                    )
-                if preferred:
-                    lines.append(f"\nMình ưu tiên các danh mục bạn quan tâm gần đây: {', '.join(preferred[:3])}.")
-                if graph_context.get("preferred_categories"):
-                    lines.append(f"\nGraph đang cho thấy bạn quan tâm nhiều đến: {', '.join(graph_context['preferred_categories'][:3])}.")
-                if graph_context.get("preferred_brands"):
-                    lines.append(f"Brand bạn tương tác nhiều: {', '.join(graph_context['preferred_brands'][:3])}.")
-                if graph_context.get("active_promotions"):
-                    lines.append(f"Khuyến mãi đang chạm tới các sản phẩm bạn quan tâm: {', '.join(graph_context['active_promotions'][:2])}.")
-                if behavior.next_best_action == "push_coupon":
-                    dynamic = self._dynamic_context(snapshot)
-                    if dynamic:
-                        lines.append(f"\nNếu bạn muốn chốt đơn sớm, hiện có vài ưu đãi có thể tận dụng:\n{dynamic}")
-                return {
-                    "answer": "\n".join(lines),
-                    "top_products": [item["product"] for item in scoped_products],
-                    "kb_hits": [hit.__dict__ for hit in kb_hits],
-                    "behavior": behavior.__dict__,
-                    "graph_context": graph_context,
-                }
-            return {
-                "answer": greeting + "\n\nHiện catalog chưa có sản phẩm khớp đúng ngân sách hoặc danh mục bạn hỏi.",
-                "top_products": [],
-                "kb_hits": [hit.__dict__ for hit in kb_hits],
-                "behavior": behavior.__dict__,
-                "graph_context": graph_context,
-            }
-
-        if intent == "policy":
-            lines = [greeting, "", "Mình tóm tắt ngắn gọn như sau:"]
-            dynamic = self._dynamic_context(snapshot)
-            if dynamic:
-                lines.append("\nDựa trên trạng thái hiện tại của tài khoản và giỏ hàng:")
-                lines.append(dynamic)
-            else:
-                lines.append("\nMình đang trả lời dựa trên chính sách và dữ liệu hệ thống hiện tại.")
-            return {
-                "answer": "\n".join(lines),
-                "top_products": [],
-                "kb_hits": [hit.__dict__ for hit in kb_hits],
-                "behavior": behavior.__dict__,
-                "graph_context": graph_context,
-            }
-
-        lines = [
-            greeting,
-            "",
-            "Mình có thể gợi ý sản phẩm theo ngân sách hoặc danh mục, đồng thời hỗ trợ các câu hỏi về coupon, thành viên, vận chuyển, giỏ hàng, thanh toán và đổi trả.",
-        ]
-        if preferred:
-            lines.append(f"Gần đây bạn đang quan tâm nhiều đến: {', '.join(preferred[:3])}.")
+            scoped_products = [item["product"] for item in category_ranked]
+        else:
+            top_scored = self._score_products(products, categories, snapshot, question, graph_context=graph_context)[:3]
+            scoped_products = [item["product"] for item in top_scored]
+            
+        dynamic = self._dynamic_context(snapshot)
+        
+        # Gom context và gọi LLM
+        prompt = self.llm.build_prompt(
+            user_name=user_name,
+            question=question,
+            behavior=behavior.__dict__,
+            products=scoped_products,
+            kb_docs=[hit.content for hit in kb_hits],
+            dynamic_context=dynamic
+        )
+        
+        llm_answer = self.llm.generate_answer(prompt)
+        
         return {
-            "answer": "\n".join(lines),
-            "top_products": [item["product"] for item in top_products],
+            "answer": llm_answer,
+            "top_products": scoped_products,
             "kb_hits": [hit.__dict__ for hit in kb_hits],
             "behavior": behavior.__dict__,
             "graph_context": graph_context,

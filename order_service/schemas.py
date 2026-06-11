@@ -5,6 +5,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class CartItemCreate(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
     product_id: int = Field(validation_alias="book_id", serialization_alias="product_id")
     quantity: int = 1
     unit_price: Optional[float] = None

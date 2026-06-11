@@ -246,10 +246,11 @@ async function renderHome() {
 
 function productCard(b) {
   const price = fmt(b.price);
+  const imageUrl = b.image_url || b.cover_image_url || `https://picsum.photos/seed/${encodeURIComponent(b.sku || b.id)}/400/600`;
   return `
     <div class="card book-card" data-id="${b.id}">
       <div class="book-cover">
-        ${b.cover_image_url ? `<img src="${b.cover_image_url}" alt="${b.title}">` : `<span style="opacity:.4">📖</span>`}
+        <img src="${imageUrl}" alt="${b.title}">
         ${(b.stock_quantity || 0) < 10 ? '<span class="book-badge">Sắp hết</span>' : ''}
       </div>
       <div class="book-info">
@@ -320,16 +321,14 @@ async function renderProducts() {
   app.innerHTML = loading();
 
   // Fetch tất cả song song một lần duy nhất
-  const [categoriesRes, brandsRes, productsRes] = await Promise.allSettled([
+  const [categoriesRes, productsRes] = await Promise.allSettled([
     Product.categories(),
-    Product.brands(),
     Product.list('', '', '', 0, 40),
   ]);
   const categories = categoriesRes.value || [];
-  const brands = brandsRes.value || [];
   let products = productsRes.value || [];
 
-  let search = '', categoryId = '', brandId = '';
+  let search = '', categoryId = '';
 
   const renderGrid = (productList) => {
     document.getElementById('product-grid').innerHTML = productList.length
@@ -363,10 +362,6 @@ async function renderProducts() {
         <option value="">Tất cả danh mục</option>
         ${categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
       </select>
-      <select class="form-input" id="filter-brand">
-        <option value="">Tất cả thương hiệu</option>
-        ${brands.map(b => `<option value="${b.id}">${b.name}</option>`).join('')}
-      </select>
     </div>
     <div id="product-grid" class="grid-4"></div>
     <div id="search-ai-slot"></div>`;
@@ -377,7 +372,6 @@ async function renderProducts() {
   document.getElementById('search-btn').onclick = () => { search = document.getElementById('search-inp').value; refetch(); };
   document.getElementById('search-inp').onkeydown = e => { if (e.key === 'Enter') { search = e.target.value; refetch(); } };
   document.getElementById('filter-category').onchange = e => { categoryId = e.target.value; refetch(); };
-  document.getElementById('filter-brand').onchange = e => { brandId = e.target.value; refetch(); };
 }
 
 // ── PRODUCT DETAIL ─────────────────────────────
@@ -403,7 +397,7 @@ async function renderProductDetail(id) {
     <div style="display:grid;grid-template-columns:280px 1fr;gap:2.5rem;align-items:start">
       <div>
         <div class="book-cover" style="border-radius:var(--radius);aspect-ratio:2/3;font-size:5rem">
-          ${b.cover_image_url ? `<img src="${b.cover_image_url}">` : '📖'}
+          <img src="${b.image_url || b.cover_image_url || `https://picsum.photos/seed/${encodeURIComponent(b.sku || b.id)}/400/600`}" alt="${b.title}">
         </div>
         <button class="btn btn-primary w-full mt-3" id="add-btn">🛒 Thêm vào giỏ</button>
         <button class="btn btn-ghost w-full mt-2" id="wish-btn">❤️ Wishlist</button>
@@ -534,15 +528,14 @@ async function renderCart() {
         <a href="#/products" class="btn btn-primary">Khám phá sản phẩm</a>
       </div>`}`;
 
-  document.getElementById('checkout-btn')?.addEventListener('click', () => navigate('/checkout'));
+  const checkoutBtn = document.getElementById('checkout-btn');
+  if (checkoutBtn) checkoutBtn.addEventListener('click', () => navigate('/checkout'));
   document.getElementById('clear-btn')?.addEventListener('click', async () => {
     await Order.clearCart(state.user.user_id); toast('Đã xóa giỏ hàng', 'info'); renderCart(); refreshCartBadge();
   });
   document.querySelectorAll('.rm-btn').forEach(b => b.addEventListener('click', async () => {
     await Order.removeItem(state.user.user_id, b.dataset.id); renderCart(); refreshCartBadge();
   }));
-  const aiSlotHtml = items.length ? '<div id="cart-ai-slot"></div>' : '';
-  app.innerHTML = app.innerHTML.replace('</div></div>`', '</div></div>' + aiSlotHtml + '`');
 
   document.querySelectorAll('.inc-btn').forEach(b => b.addEventListener('click', async () => {
     await Order.updateQty(state.user.user_id, b.dataset.id, parseInt(b.dataset.qty) + 1); renderCart();
@@ -835,12 +828,61 @@ async function renderWishlist() {
 async function renderStaffDashboard() {
   if (!state.user || state.user.user_type !== 'staff') { navigate('/login'); return; }
   app.innerHTML = loading();
-  const [statsRes, ordersRes, productsRes] = await Promise.allSettled([
-    Order.stats(), Order.allOrders(0), Product.list('', '', '', 0, 20)
+
+  const pageSize = 10;
+  let currentPage = 1;
+  let products = [];
+  let hasNextPage = false;
+
+  const fetchProductsPage = async (page = 1) => {
+    const skip = (page - 1) * pageSize;
+    const result = await Product.list('', '', '', skip, pageSize + 1).catch(() => []);
+    hasNextPage = result.length > pageSize;
+    products = hasNextPage ? result.slice(0, pageSize) : result;
+    currentPage = page;
+    renderProductTable();
+  };
+
+  const renderProductTable = () => {
+    const productSection = document.getElementById('product-manager-section');
+    if (!productSection) return;
+    productSection.innerHTML = `
+      <div class="section-header">
+        <h2 class="section-title" style="font-size:1.1rem">📦 Quản lý sản phẩm</h2>
+        <button class="btn btn-primary btn-sm" id="add-product-btn">+ Thêm sản phẩm</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap table-scroll">
+          <table>
+            <thead><tr><th>Tên sản phẩm</th><th>Giá</th><th>Kho</th></tr></thead>
+            <tbody>
+              ${products.map(b => `
+                <tr>
+                  <td>${b.title}</td>
+                  <td class="text-indigo">${fmt(b.price)}</td>
+                  <td>${b.stock_quantity}</td>
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+        <div class="table-pagination">
+          <button class="btn btn-secondary btn-sm" id="prev-products-btn" ${currentPage === 1 ? 'disabled' : ''}>‹ Trước</button>
+          <span>Trang ${currentPage}${hasNextPage ? '' : ''}</span>
+          <button class="btn btn-secondary btn-sm" id="next-products-btn" ${hasNextPage ? '' : 'disabled'}>Tiếp ›</button>
+        </div>
+      </div>`;
+
+    document.getElementById('add-product-btn').onclick = () => showAddProductModal();
+    document.getElementById('prev-products-btn').onclick = () => fetchProductsPage(currentPage - 1);
+    document.getElementById('next-products-btn').onclick = () => fetchProductsPage(currentPage + 1);
+  };
+
+  const [statsRes, ordersRes, totalProductsRes] = await Promise.allSettled([
+    Order.stats(), Order.allOrders(0), Product.list('', '', '', 0, 1000)
   ]);
   const stats = statsRes.value || [];
   const orders = ordersRes.value || [];
-  const products = productsRes.value || [];
+  const totalProducts = totalProductsRes.value || [];
 
   const totalRev = stats.reduce((s, r) => s + (r.total_revenue || 0), 0);
   const totalOrd = stats.reduce((s, r) => s + (r.count || 0), 0);
@@ -850,7 +892,7 @@ async function renderStaffDashboard() {
     <div class="stats-grid mb-4">
       <div class="stat-card"><div class="stat-value">${totalOrd}</div><div class="stat-label">Tổng đơn hàng</div></div>
       <div class="stat-card"><div class="stat-value">${fmt(totalRev)}</div><div class="stat-label">Doanh thu</div></div>
-      <div class="stat-card"><div class="stat-value">${products.length}</div><div class="stat-label">Sản phẩm hiện có</div></div>
+      <div class="stat-card"><div class="stat-value">${totalProducts.length}</div><div class="stat-label">Sản phẩm hiện có</div></div>
       <div class="stat-card"><div class="stat-value">${stats.find(s => s.status === 'PENDING')?.count || 0}</div><div class="stat-label">Đơn chờ xử lý</div></div>
     </div>
 
@@ -882,30 +924,10 @@ async function renderStaffDashboard() {
           </div>
         </div>
       </div>
-      <div>
-        <div class="section-header">
-          <h2 class="section-title" style="font-size:1.1rem">📦 Quản lý sản phẩm</h2>
-          <button class="btn btn-primary btn-sm" id="add-product-btn">+ Thêm sản phẩm</button>
-        </div>
-        <div class="card">
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Tên sản phẩm</th><th>Giá</th><th>Kho</th></tr></thead>
-              <tbody>
-                ${products.slice(0, 10).map(b => `
-                  <tr>
-                    <td>${b.title}</td>
-                    <td class="text-indigo">${fmt(b.price)}</td>
-                    <td>${b.stock_quantity}</td>
-                  </tr>`).join('')}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      <div id="product-manager-section"></div>
     </div>`;
 
-  document.getElementById('add-product-btn').onclick = () => showAddProductModal();
+  await fetchProductsPage(1);
 }
 
 async function updateOrderStatus(orderId, status) {
@@ -1050,36 +1072,6 @@ document.getElementById('user-menu-btn')?.addEventListener('click', e => {
 document.addEventListener('click', () => document.getElementById('user-dropdown')?.classList.remove('open'));
 document.getElementById('logout-btn')?.addEventListener('click', logout);
 
-// ── Theme Switcher ────────────────────────────
-function initTheme() {
-  const savedTheme = localStorage.getItem('app-theme') || 'cyberpunk';
-  document.documentElement.setAttribute('data-theme', savedTheme);
-  
-  const themeBtn = document.getElementById('theme-btn');
-  const themeDropdown = document.getElementById('theme-dropdown');
-  
-  if (themeBtn && themeDropdown) {
-    themeBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      themeDropdown.classList.toggle('open');
-    });
-    
-    document.addEventListener('click', () => {
-      themeDropdown.classList.remove('open');
-    });
-    
-    document.querySelectorAll('.theme-opt').forEach(opt => {
-      opt.addEventListener('click', () => {
-        const theme = opt.dataset.theme;
-        document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('app-theme', theme);
-        toast(`Đã đổi sang giao diện: ${opt.textContent.trim()}`, 'success');
-      });
-    });
-  }
-}
-// Apply early to prevent style flash
-const savedThemeEarly = localStorage.getItem('app-theme') || 'cyberpunk';
-document.documentElement.setAttribute('data-theme', savedThemeEarly);
-
-window.addEventListener('DOMContentLoaded', initTheme);
+// ── Fixed light theme ─────────────────────────
+localStorage.removeItem('app-theme');
+document.documentElement.setAttribute('data-theme', 'light');

@@ -9,3 +9,5 @@ neo4j
 torch
 pandas
 matplotlib
+groq
+python-dotenv

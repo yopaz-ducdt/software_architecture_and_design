@@ -51,6 +51,7 @@ DEFAULT_PRODUCTS = [
         "product_type_slug": "book",
         "brand_slug": "nxb-tre",
         "description": "Sách self-help tiếng Anh về xây dựng thói quen bền vững.",
+        "image_url": "https://picsum.photos/seed/atomic-habits/400/600",
         "attributes": {"language": "en", "genre": "Self-Help", "author": "James Clear"},
     },
     {
@@ -62,6 +63,7 @@ DEFAULT_PRODUCTS = [
         "product_type_slug": "stationery",
         "brand_slug": "campus",
         "description": "Sổ tay giấy mịn phù hợp ghi chép hằng ngày và học nhóm.",
+        "image_url": "https://picsum.photos/seed/campus-b5/400/600",
         "attributes": {"size": "B5", "pages": 120},
     },
     {
@@ -120,6 +122,17 @@ DEFAULT_PRODUCTS = [
         "attributes": {"battery": "AAA", "exam_support": "high_school"},
     },
     {
+        "name": "Đồng hồ Learny Watch",
+        "sku": "TECH-LEARNY-WATCH",
+        "price": 350000,
+        "stock_quantity": 90,
+        "category_slug": "study-tech",
+        "product_type_slug": "study-tech",
+        "brand_slug": "casio",
+        "description": "Đồng hồ thông minh nhỏ gọn giúp xem giờ và nhắc lịch học tập.",
+        "attributes": {"display": "LED", "battery": "Li-ion", "features": "xem gio, nhac lich"},
+    },
+    {
         "name": "Bộ chì màu Faber-Castell 24 màu",
         "sku": "ART-FABER-24",
         "price": 189000,
@@ -128,6 +141,7 @@ DEFAULT_PRODUCTS = [
         "product_type_slug": "art-supply",
         "brand_slug": "faber-castell",
         "description": "Bộ chì màu chất lượng cao dành cho học sinh yêu thích mỹ thuật.",
+        "image_url": "https://picsum.photos/seed/faber-castell-24/400/600",
         "attributes": {"colors": 24, "target": "students"},
     },
     {
@@ -139,6 +153,7 @@ DEFAULT_PRODUCTS = [
         "product_type_slug": "desk-decor",
         "brand_slug": "minihome",
         "description": "Đèn bàn LED với ba chế độ sáng cho góc học tập hiện đại.",
+        "image_url": "https://picsum.photos/seed/minihome-lamp/400/600",
         "attributes": {"light_mode": 3, "power": "USB"},
     },
     {
@@ -150,6 +165,7 @@ DEFAULT_PRODUCTS = [
         "product_type_slug": "souvenir",
         "brand_slug": "moji",
         "description": "Móc khóa plush dễ thương dùng làm quà tặng hoặc phụ kiện balo.",
+        "image_url": "https://picsum.photos/seed/moji-capybara/400/600",
         "attributes": {"theme": "capybara", "material": "plush"},
     },
 ]

@@ -1,10 +1,13 @@
-# Huong Dan Chay Project Tren macOS va Ubuntu
+# Huong Dan Chay Project Tren macOS
 
 Project nay nen chay bang Docker Compose. Cach nay tu dong dung MySQL, RabbitMQ, Neo4j, API Gateway, frontend va cac microservice FastAPI, tranh phai cai tung service Python tren may.
 
+Tren macOS, khuyen nghi dung `colima` thay cho Docker Desktop de giam RAM va CPU. Tat ca lenh docker compose trong tai lieu van giu nguyen.
+
 ## 1. Yeu cau chung
 
-- Docker va Docker Compose v2
+- Docker Engine (Colima tren macOS)
+- Docker Compose v2
 - Python 3.10+ de chay seed data tu may host
 - Git
 - May con trong cac cong: `3307`, `4000`, `5672`, `7474`, `7687`, `8000-8013`, `15672`
@@ -17,24 +20,74 @@ Thong tin database mac dinh trong project:
 - Neo4j user/password: `neo4j` / `learnmart_graph_password`
 - RabbitMQ user/password: `guest` / `guest`
 
-## 2. Cai dat tren macOS
+docker compose version
+docker ps
+docker context use colima
+git --version
 
-### 2.1. Cai Docker Desktop
+## 2. Cai dat tren macOS (ưu tiên cho MacBook Air M1/M2/M3/M4)
 
-1. Tai va cai Docker Desktop for Mac.
-2. Mo Docker Desktop va doi den khi Docker bao dang running.
-3. Kiem tra trong Terminal:
+Trên macOS (đặc biệt MacBook Air có chip Apple Silicon như M4), khuyến nghị dùng `colima` thay cho Docker Desktop để tiết kiệm tài nguyên và tránh một số vấn đề tương thích.
+
+### 2.1. Cài Colima & Docker CLI (khuyến nghị cho M-series)
+
+1. Cài Homebrew nếu chưa có:
 
 ```bash
-docker --version
-docker compose version
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-Neu dung chip Apple Silicon, Docker Desktop van chay duoc project nay binh thuong. Lan build dau tien co the lau hon.
+2. Cài Docker CLI và Colima:
 
-### 2.2. Cai Python va Git neu chua co
+```bash
+brew install docker colima
+```
 
-Neu da cai Homebrew:
+3. Khởi động Colima với cấu hình khuyến nghị cho MacBook Air M4 (tùy máy, chỉnh `--cpu`/`--memory` nếu cần):
+
+```bash
+# Thông thường: 4 CPU, 6GB RAM, 50GB disk
+colima start --cpu 4 --memory 6 --disk 50
+
+# Nếu gặp lỗi do image chỉ hỗ trợ amd64, khởi động lại với kiến trúc x86_64 (chậm hơn):
+colima stop
+colima start --arch x86_64 --cpu 4 --memory 6 --disk 50
+```
+
+4. Chuyển Docker context sang Colima và kiểm tra:
+
+```bash
+docker context ls
+docker context use colima
+docker --version
+docker compose version
+docker ps
+```
+
+5. Ghi chú về Apple Silicon:
+
+- Nên ưu tiên các image đa kiến trúc hoặc arm64-native vì nhanh và tiết kiệm tài nguyên.
+- Chỉ dùng `--arch x86_64` khi thực sự cần (một số image cũ chỉ có amd64). Colima sẽ chạy slow hơn khi bắt chước kiến trúc khác.
+
+6. Tối ưu tài nguyên (nếu máy chậm):
+
+```bash
+# Tăng/giảm CPU & RAM khi cần
+colima stop
+colima start --cpu 2 --memory 4096 --disk 50
+```
+
+### 2.2. (Tùy chọn) Cài Rosetta 2
+
+Một vài công cụ hoặc binary Intel cần Rosetta trên Apple Silicon. Cài khi cần:
+
+```bash
+softwareupdate --install-rosetta --agree-to-license
+```
+
+### 2.3. Cài Python & Git (nếu cần để chạy seed scripts)
+
+Nếu đã cài Homebrew:
 
 ```bash
 brew install python git
@@ -42,65 +95,13 @@ python3 --version
 git --version
 ```
 
-Neu khong dung Homebrew, co the cai Python tu python.org va Git tu installer chinh thuc.
+Nếu không dùng Homebrew, có thể cài Python từ python.org và Git từ installer chính thức.
 
-## 3. Cai dat tren Ubuntu
+## 3. Lay source code va vao thu muc project
 
-### 3.1. Cap nhat he thong va cai cong cu co ban
+`cd` vao thu muc project:
 
-```bash
-sudo apt update
-sudo apt install -y git python3 python3-pip python3-venv curl
-```
-
-### 3.2. Cai Docker
-
-Neu may chua co Docker, cai Docker Engine theo bo lenh co ban:
-
-```bash
-sudo apt install -y docker.io docker-compose-v2
-sudo systemctl enable docker
-sudo systemctl start docker
-```
-
-Cho phep user hien tai chay Docker khong can `sudo`:
-
-```bash
-sudo usermod -aG docker $USER
-```
-
-Sau lenh nay, dang xuat/dang nhap lai hoac restart terminal, roi kiem tra:
-
-```bash
-docker --version
-docker compose version
-docker ps
-```
-
-Neu `docker ps` van bao permission denied, chay tam bang `sudo docker ps` hoac dang nhap lai may.
-
-## 4. Lay source code va vao thu muc project
-
-Neu da co source tren may, chi can `cd` vao thu muc project:
-
-```bash
-cd marketplace_with_ai_service
-```
-
-Neu lay tu Git:
-
-```bash
-git clone <repo-url>
-cd marketplace_with_ai_service
-```
-
-Kiem tra phai thay file `docker-compose.yml`:
-
-```bash
-ls docker-compose.yml
-```
-
-## 5. Chay toan bo he thong bang Docker Compose
+## 4. Chay toan bo he thong bang Docker Compose
 
 Tai thu muc goc cua project, chay:
 
@@ -142,20 +143,11 @@ docker compose logs -f product_service
 docker compose logs -f frontend
 ```
 
-## 6. Seed du lieu demo
+## 5. Seed du lieu demo
 
 Sau khi cac container da chay, tao virtual environment tren may host de chay seed script:
 
 ### macOS
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install requests
-```
-
-### Ubuntu
 
 ```bash
 python3 -m venv .venv
@@ -177,7 +169,7 @@ Neu chi muon seed catalog co ban:
 python seed_catalog.py
 ```
 
-## 7. Truy cap ung dung
+## 6. Truy cap ung dung
 
 - Frontend: `http://localhost:4000`
 - API Gateway: `http://localhost:8000`
@@ -208,7 +200,7 @@ Tai khoan demo sau khi seed:
 - Staff username: `admin`
 - Staff password: `admin123`
 
-## 8. Lenh dung, restart va reset
+## 7. Lenh dung, restart va reset
 
 Dung container nhung giu database volume:
 
@@ -239,7 +231,7 @@ python seed_ai_demo.py
 
 Luu y: `docker compose down -v` se xoa volume MySQL va Neo4j, mat toan bo du lieu da seed.
 
-## 9. Troubleshooting
+## 8. Troubleshooting
 
 ### 9.1. Port bi trung
 
@@ -251,14 +243,6 @@ macOS:
 lsof -i :4000
 lsof -i :8000
 lsof -i :3307
-```
-
-Ubuntu:
-
-```bash
-sudo lsof -i :4000
-sudo lsof -i :8000
-sudo lsof -i :3307
 ```
 
 Dung process dang chiem port, hoac sua mapping port trong `docker-compose.yml`.
@@ -304,20 +288,6 @@ python seed_data.py
 python seed_ai_demo.py
 ```
 
-### 9.4. Ubuntu chay Docker bi permission denied
-
-Them user vao group docker:
-
-```bash
-sudo usermod -aG docker $USER
-```
-
-Dang xuat/dang nhap lai, sau do kiem tra:
-
-```bash
-docker ps
-```
-
 ### 9.5. Frontend khong load duoc API
 
 Kiem tra API Gateway:
@@ -334,6 +304,16 @@ docker compose logs -f frontend
 ```
 
 Neu moi build lan dau, doi them vai chuc giay roi refresh `http://localhost:4000`.
+
+### Docker khong ket noi duoc tren macOS
+
+```bash
+colima status
+colima start
+docker context ls
+docker context use colima
+docker ps
+```
 
 ## 10. Cach chay khuyen nghi khi demo
 
